@@ -11,7 +11,7 @@ packages = [{include = "arduino_10base_t1s"}]
 python = "^3.9"
 
 [tool.poetry.group.dev.dependencies]
-codespell = "^2.2.5"
+codespell = "^2.3.0"
 
 [build-system]
 requires = ["poetry-core"]
