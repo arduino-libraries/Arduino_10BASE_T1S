@@ -34,18 +34,18 @@
 #if defined(ARDUINO_SAMD_ZERO) || defined(ARDUINO_MINIMA) || defined(ARDUINO_UNOWIFIR4) || defined(ARDUINO_AVR_UNO_WIFI_REV2) || defined(ARDUINO_GIGA)
 /* Those are all boards with the Arduino Uno form factor for the T1S shield. */
 static int const CS_PIN    =  9;
-static int const RESET_PIN =  4;
+static int const RESET_PIN =  6;
 static int const IRQ_PIN   =  2;
 #elif defined(ARDUINO_PORTENTA_H7_M7) || defined(ARDUINO_PORTENTA_H7_M4)
 /* Pro Demo kit on MID carrier, UNO form factor */
 #include "pinDefinitions.h"
 static int const CS_PIN    =  PinNameToIndex(PH_6);
-static int const RESET_PIN =  PinNameToIndex(PJ_11);
+static int const RESET_PIN =  PinNameToIndex(PH_15); /* D6 (Uno form factor) -> PWM6 (Mid carrier headers) = PH15 (Portenta H7 high-density connectors) */
 static int const IRQ_PIN   =  PinNameToIndex(PC_7);
 #elif defined(ARDUINO_PORTENTA_C33)
 /* Pro Demo kit on MID carrier, UNO form factor */
 static int const CS_PIN    =  25;
-static int const RESET_PIN =  4;
+static int const RESET_PIN =  6;  /* D6 (Uno form factor) -> PWM6 (Mid carrier headers) = P601 (Portenta C33 high-density connectors) = D6 */
 static int const IRQ_PIN   =  2;
 #else
 # error "No pins defined for your board"
