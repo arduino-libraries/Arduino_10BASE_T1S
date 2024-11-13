@@ -98,7 +98,7 @@
  * this should be set high.
  */
 #ifndef MEMP_NUM_PBUF
-#define MEMP_NUM_PBUF                   20
+#define MEMP_NUM_PBUF                   32
 #endif
 
 /**
@@ -201,7 +201,7 @@
  * PBUF_POOL_SIZE: the number of buffers in the pbuf pool.
  */
 #ifndef PBUF_POOL_SIZE
-#define PBUF_POOL_SIZE                  1
+#define PBUF_POOL_SIZE                  4
 #endif
 
 /*
