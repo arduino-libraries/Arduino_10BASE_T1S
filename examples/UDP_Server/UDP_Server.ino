@@ -32,7 +32,7 @@ static IPAddress const gateway     {192, 168,  42, 100};
 static T1SPlcaSettings const t1s_plca_settings{T1S_PLCA_NODE_ID};
 static T1SMacSettings const t1s_default_mac_settings;
 
-static uint16_t const UDP_SERVER_LOCAL_PORT = 8888;
+static uint16_t const UDP_SERVER_LOCAL_PORT = 5001;
 
 /**************************************************************************************
  * GLOBAL VARIABLES
@@ -114,12 +114,12 @@ void loop()
 
   auto const now = millis();
 
-  if ((now - prev_beacon_check) > 1000)
-  {
-    prev_beacon_check = now;
-    if (!tc6_inst->getPlcaStatus(OnPlcaStatus))
-      Serial.println("getPlcaStatus(...) failed");
-  }
+//  if ((now - prev_beacon_check) > 1000)
+//  {
+//    prev_beacon_check = now;
+//    if (!tc6_inst->getPlcaStatus(OnPlcaStatus))
+//      Serial.println("getPlcaStatus(...) failed");
+//  }
 
   /* Check for incoming UDP packets. */
   int const rx_packet_size = udp_server.parsePacket();
@@ -130,15 +130,15 @@ void loop()
     uint16_t const destination_port = udp_server.remotePort();
 
     /* Print some metadata from received UDP packet. */
-    Serial.print("[");
-    Serial.print(millis());
-    Serial.print("] Received ");
-    Serial.print(rx_packet_size);
-    Serial.print(" bytes from ");
-    Serial.print(udp_server.remoteIP());
-    Serial.print(" port ");
-    Serial.print(udp_server.remotePort());
-    Serial.print(", data = \"");
+//    Serial.print("[");
+//    Serial.print(millis());
+//    Serial.print("] Received ");
+//    Serial.print(rx_packet_size);
+//    Serial.print(" bytes from ");
+//    Serial.print(udp_server.remoteIP());
+//    Serial.print(" port ");
+//    Serial.print(udp_server.remotePort());
+//    Serial.print(", data = \"");
 
     /* Read from received UDP packet. */
     size_t const UDP_RX_MSG_BUF_SIZE = 16 + 1; /* Reserve the last byte for the '\0' termination. */
@@ -151,18 +151,18 @@ void loop()
 
       /* Print received data to Serial. */
       udp_rx_msg_buf[bytes_read] = '\0'; /* Terminate buffer so that we can print it as a C-string. */
-      Serial.print(reinterpret_cast<char *>(udp_rx_msg_buf));
+//      Serial.print(reinterpret_cast<char *>(udp_rx_msg_buf));
 
       /* Continue reading. */
       bytes_read = udp_server.read(udp_rx_msg_buf, UDP_RX_MSG_BUF_SIZE - 1);
     }
-    Serial.println("\"");
+//    Serial.println("\"");
 
     /* Finish reading the current packet. */
     udp_server.flush();
 
     /* Send back a reply, to the IP address and port we got the packet from. */
-    udp_server.beginPacket(destination_ip, destination_port);
+    udp_server.beginPacket(destination_ip, 5001);
     udp_server.write(udp_tx_buf.data(), udp_tx_buf.size());
     udp_server.endPacket();
   }

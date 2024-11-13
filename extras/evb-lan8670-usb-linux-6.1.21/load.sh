@@ -1,7 +1,7 @@
 #!/bin/bash
 
 enable=1
-node_id=0
+node_id=4
 node_count=8
 max_bc=0
 burst_timer=128
