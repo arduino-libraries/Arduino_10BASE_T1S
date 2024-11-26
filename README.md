@@ -9,7 +9,7 @@
 
 ### How-to-compile/upload
 ```bash
-arduino-cli compile -b arduino:renesas_uno:unor4wifi -v examples/iperf-client -u -p /dev/ttyACM0
+arduino-cli compile -b arduino:renesas_uno:unor4wifi -v examples/UDP_Client -u -p /dev/ttyACM0
 ```
 
 ### How-to-[`EVB-LAN8670-USB`](https://www.microchip.com/en-us/development-tool/EV08L38A)
