@@ -29,6 +29,19 @@ class Arduino_10BASE_T1S_PHY_Interface
 public:
   virtual ~Arduino_10BASE_T1S_PHY_Interface() { }
 
+  /**
+   * @brief Initializes the PHY interface with the specified network settings.
+   *
+   * This method configures the PHY interface with the provided IP address,
+   * network mask, gateway, MAC address, and PLCA settings.
+   *
+   * @param ip_addr The IP address to assign to the interface.
+   * @param network_mask The network mask to use.
+   * @param gateway The gateway IP address.
+   * @param mac_addr The MAC address to assign to the interface.
+   * @param t1s_plca_settings The PLCA settings to use.
+   * @return Returns true if the initialization was successful, false otherwise.
+   */
   virtual bool begin(IPAddress const ip_addr,
                      IPAddress const network_mask,
                      IPAddress const gateway,

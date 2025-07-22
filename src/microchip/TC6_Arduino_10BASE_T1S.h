@@ -74,11 +74,31 @@ enum class DIO { A0, A1 };
 class TC6_Arduino_10BASE_T1S : public Arduino_10BASE_T1S_PHY_Interface
 {
 public:
+  /**
+   * @class TC6_Arduino_10BASE_T1S
+   * @brief Arduino 10BASE-T1S PHY interface implementation using TC6.
+   *
+   * This class provides the implementation of the Arduino_10BASE_T1S_PHY_Interface
+   * using the TC6 hardware abstraction layer for 10BASE-T1S communication.
+   */
   TC6_Arduino_10BASE_T1S(TC6_Io & tc6_io);
 
   virtual ~TC6_Arduino_10BASE_T1S();
 
-
+  /**
+   * @brief Initializes the TC6 Arduino 10BASE-T1S PHY interface with the specified network settings.
+   *
+   * This method configures the TC6 interface with the provided IP address,
+   * network mask, gateway, MAC address, and PLCA settings.
+   *
+   * @param ip_addr The IP address to assign to the interface.
+   * @param network_mask The network mask to use.
+   * @param gateway The gateway IP address.
+   * @param mac_addr The MAC address to assign to the interface.
+   * @param t1s_plca_settings The PLCA settings to use.
+   * @param t1s_mac_settings The MAC settings to use.
+   * @return Returns true if the initialization was successful, false otherwise.
+   */
   virtual bool begin(IPAddress const ip_addr,
                      IPAddress const network_mask,
                      IPAddress const gateway,
@@ -88,14 +108,36 @@ public:
 
 
   virtual void service() override;
-
+  
   void digitalWrite(DIO const dio, bool const value);
 
+  /**
+   * @brief Gets the PLCA status.
+   *
+   * This method retrieves the current PLCA status from the TC6 hardware.
+   *
+   * @param on_plca_status Callback function to handle the PLCA status.
+   * @return bool Returns true if the PLCA status was successfully retrieved, false otherwise.
+   */
   bool getPlcaStatus(TC6LwIP_On_PlcaStatus on_plca_status);
+  /**
+   * @brief Enables PLCA (Physical Layer Collision Avoidance).
+   *
+   * This method enables the PLCA functionality on the TC6 hardware.
+   *
+   * @return bool Returns true if PLCA was successfully enabled, false otherwise.
+   */
   bool enablePlca();
 
+  /**
+   * @brief Checks if sending data would block.
+   *
+   * This method checks if the TC6 hardware is currently able to send data
+   * without blocking.
+   *
+   * @return bool Returns true if sending data would block, false otherwise.
+   */
   bool sendWouldBlock();
-
 
 private:
   TC6_Io & _tc6_io;
