@@ -1,0 +1,25 @@
+#######################################
+# Syntax Coloring Map
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+beginPacket	KEYWORD2
+endPacket	KEYWORD2
+write	    KEYWORD2
+parsePacket KEYWORD2
+available   KEYWORD2
+read        KEYWORD2
+peek        KEYWORD2
+flush       KEYWORD2
+remoteIP    KEYWORD2
+remotePort  KEYWORD2
+
+######################################
+# Constants (LITERAL1)
+#######################################
