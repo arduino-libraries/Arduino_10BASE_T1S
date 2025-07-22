@@ -8,13 +8,17 @@ on:
       - ".github/workflows/render-documentation.ya?ml"
       - "examples/**"
       - "src/**"
+      - "!src/lib/**"
+      - "!src/microchip/**"
   pull_request:
     branches:
-      - main
+      - docs_refactor
     paths:
       - ".github/workflows/render-documentation.ya?ml"
       - "examples/**"
       - "src/**"
+      - "!src/lib/**"
+      - "!src/microchip/**"
   workflow_dispatch:
       
 jobs:
