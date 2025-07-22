@@ -3,7 +3,7 @@ name: Render Documentation
 on:
   push:
     branches:
-      - main
+      - docs_refactor
     paths:
       - ".github/workflows/render-documentation.ya?ml"
       - "examples/**"
