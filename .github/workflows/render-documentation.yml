@@ -30,3 +30,4 @@ jobs:
       source-path: './src'
       target-path: './docs/api.md'
       fail-on-warnings: false
+      exclude-pattern: '*/lib/* */microchip/*'
