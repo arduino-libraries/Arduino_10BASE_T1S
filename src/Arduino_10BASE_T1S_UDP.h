@@ -33,12 +33,28 @@
  * CLASS DECLARATION
  **************************************************************************************/
 
+
 class Arduino_10BASE_T1S_UDP : public UDP
 {
 public:
   /**
    * @class Arduino_10BASE_T1S_UDP
    * @brief UDP communication class for Arduino 10BASE-T1S library.
+   *
+   * This class provides an implementation of the UDP protocol for the Arduino 10BASE-T1S library.
+   * It enables sending and receiving UDP packets over a 10BASE-T1S Ethernet interface, supporting
+   * both transmission and reception of data. The class inherits from the standard Arduino UDP base
+   * class, and overrides its methods to provide the necessary functionality for packet management,
+   * buffer handling, and communication with the underlying hardware.
+   *
+   * Features:
+   * - Initialization and termination of UDP sockets.
+   * - Sending UDP packets to specified IP addresses or hostnames and ports.
+   * - Receiving UDP packets, with support for buffer management and packet queueing.
+   * - Access to remote sender's IP address and port for received packets.
+   * - Internal buffer size configuration for received packets.
+   *
+   * @note This class is intended for use with the Arduino 10BASE-T1S library and is not a general-purpose UDP implementation.
    */
            Arduino_10BASE_T1S_UDP();
   virtual ~Arduino_10BASE_T1S_UDP();
