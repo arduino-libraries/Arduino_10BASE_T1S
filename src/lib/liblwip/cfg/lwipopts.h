@@ -726,5 +726,19 @@ extern unsigned char debug_flags;
 #define etharp_output t1s_etharp_output
 #define icmp_input t1s_icmp_input
 #define icmp_dest_unreach t1s_icmp_dest_unreach
+#define memp_RAW_PCB t1s_memp_RAW_PCB
+#define raw_input t1s_raw_input
+#define raw_bind t1s_raw_bind
+#define raw_bind_netif t1s_raw_bind_netif
+#define raw_connect t1s_raw_connect
+#define raw_disconnect t1s_raw_disconnect
+#define raw_recv t1s_raw_recv
+#define raw_sendto_if_src t1s_raw_sendto_if_src
+#define raw_sendto t1s_raw_sendto
+#define raw_send t1s_raw_send
+#define raw_remove t1s_raw_remove
+#define raw_new t1s_raw_new
+#define raw_new_ip_type t1s_raw_new_ip_type
+#define raw_netif_ip_addr_changed t1s_raw_netif_ip_addr_changed
 
 #endif /* LWIP_LWIPOPTS_H */
