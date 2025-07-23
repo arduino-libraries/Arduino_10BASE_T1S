@@ -3,7 +3,7 @@ name: Render Documentation
 on:
   push:
     branches:
-      - docs_refactor
+      - main
     paths:
       - ".github/workflows/render-documentation.ya?ml"
       - "examples/**"
@@ -12,7 +12,7 @@ on:
       - "!src/microchip/**"
   pull_request:
     branches:
-      - docs_refactor
+      - main
     paths:
       - ".github/workflows/render-documentation.ya?ml"
       - "examples/**"
