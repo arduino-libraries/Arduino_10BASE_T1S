@@ -36,11 +36,11 @@ To enable Single Pair Ethernet communication, you must connect an external and c
 
 If you encounter any issue, please open a bug report [here](https://github.com/arduino-libraries/Arduino_10BASE_T1S/issues). 
 
+For questions, comments, or feedback on this library, please use the official [Arduino Forum](https://forum.arduino.cc/).
+
 ## 🫂 Contributing
 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
-
-For questions, comments, or feedback on this library, please create an issue on this repository.
 
 ## ⚖️ License
 
