@@ -14,7 +14,7 @@
  * INCLUDE
  **************************************************************************************/
 
-#include <api/IPAddress.h>
+#include <IPAddress.h> // api/IPAddress.h
 
 #include "MacAddress.h"
 #include "T1SMacSettings.h"

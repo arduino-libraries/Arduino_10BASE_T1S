@@ -19,8 +19,8 @@
 #include <vector>
 #include <memory>
 
-#include <api/Udp.h>
-#include <api/IPAddress.h>
+#include <Udp.h> // api/Udp.h
+#include <IPAddress.h> // api/IPAddress.h
 
 #include "lib/liblwip/include/lwip/udp.h"
 #include "lib/liblwip/include/lwip/ip_addr.h"
