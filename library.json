@@ -1,0 +1,22 @@
+{
+  "name": "Arduino_10BASE_T1S",
+  "version": "0.1.1",
+  "description": "Generic library for providing IP based 10BASE-T1S communication.",
+  "keywords": ["ethernet", "10base-t1s", "lwip", "single-pair"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/arduino-libraries/Arduino_10BASE_T1S"
+  },
+  "homepage": "https://github.com/arduino-libraries/Arduino_10BASE_T1S",
+  "authors": [
+    {"name": "Alexander Entinger", "email": "a.entinger@arduino.cc", "maintainer": true}
+  ],
+  "license": "MPL-2.0",
+  "build": {
+    "srcFilter": [
+      "+<*>",
+      "-<src/lib/liblwip/**>"
+    ]
+  },
+  "note": "The bundled liblwip sources are excluded here because on RP2040 (arduino-pico) the core already supplies a compatible lwIP 2.x stack. The library source files use #ifdef ARDUINO_ARCH_RP2040 to switch between the core-supplied headers (<lwip/...>) and the bundled headers. For non-RP2040 targets (e.g. Arduino UNO R4 / Renesas) a separate environment that re-adds the liblwip sources is needed."
+}
