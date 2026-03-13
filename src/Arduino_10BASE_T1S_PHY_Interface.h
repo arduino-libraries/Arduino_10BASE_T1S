@@ -14,11 +14,13 @@
  * INCLUDE
  **************************************************************************************/
 
-#include <IPAddress.h> // api/IPAddress.h
+#include <api/IPAddress.h>
 
 #include "MacAddress.h"
 #include "T1SMacSettings.h"
 #include "T1SPlcaSettings.h"
+
+using arduino::IPAddress;
 
 /**************************************************************************************
  * CLASS DECLARATION

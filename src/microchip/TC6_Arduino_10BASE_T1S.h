@@ -18,7 +18,11 @@
 
 #include <stdint.h>
 
+#if defined(ARDUINO_ARCH_RP2040)
+#include <lwip/netif.h>
+#else
 #include "lib/liblwip/include/lwip/netif.h"
+#endif
 
 #include "microchip/lib/libtc6/inc/tc6.h"
 
@@ -138,6 +142,31 @@ public:
    * @return bool Returns true if sending data would block, false otherwise.
    */
   bool sendWouldBlock();
+
+  /**
+   * @brief Returns a pointer to the underlying lwIP netif structure.
+   *
+   * Needed for direct lwIP calls such as dhcp_start().
+   *
+   * @return Pointer to the lwIP netif struct used by this interface.
+   */
+  struct netif* getNetif() { return &_lw.ip.netint; }
+
+  /**
+   * @brief Returns the current IP address (static or DHCP-assigned).
+   *
+   * @return IPAddress The currently assigned IPv4 address.
+   */
+  IPAddress localIP();
+
+  /**
+   * @brief Stops and restarts the DHCP client on this interface.
+   *
+   * Call this after PLCA becomes active so that a fresh DHCP Discover is
+   * sent on a live link rather than relying on the exponential back-off
+   * retry that started before the link was established.
+   */
+  void restartDhcp();
 
 private:
   TC6_Io & _tc6_io;

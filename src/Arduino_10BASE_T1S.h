@@ -16,9 +16,21 @@
 
 #include "Arduino_10BASE_T1S_PHY_Interface.h"
 #include "Arduino_10BASE_T1S_UDP.h"
+#include "Arduino_10BASE_T1S_HTTP.h"
 
 #include "microchip/TC6_Arduino_10BASE_T1S.h"
 
+#if defined(ARDUINO_ARCH_RP2040)
+/* Use the lwIP stack supplied by the arduino-pico core. */
+#include <lwip/netif.h>
+#include <lwip/init.h>
+#include <lwip/timeouts.h>
+#include <netif/etharp.h>
+#include <lwip/mem.h>
+#include <lwip/memp.h>
+#include <lwip/udp.h>
+#include <lwip/tcp.h>
+#else
 #include "lib/liblwip/include/lwip/netif.h"
 #include "lib/liblwip/include/lwip/init.h"
 #include "lib/liblwip/include/lwip/timeouts.h"
@@ -26,6 +38,8 @@
 #include "lib/liblwip/include/lwip/mem.h"
 #include "lib/liblwip/include/lwip/memp.h"
 #include "lib/liblwip/include/lwip/udp.h"
+#include "lib/liblwip/include/lwip/tcp.h"
+#endif
 
 /**************************************************************************************
  * CONSTANTS
