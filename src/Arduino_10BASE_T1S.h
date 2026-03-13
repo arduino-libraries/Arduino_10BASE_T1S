@@ -61,6 +61,12 @@ static int const IRQ_PIN   =  PinNameToIndex(PC_7);
 static int const CS_PIN    =  25;
 static int const RESET_PIN =  6;  /* D6 (Uno form factor) -> PWM6 (Mid carrier headers) = P601 (Portenta C33 high-density connectors) = D6 */
 static int const IRQ_PIN   =  2;
+#elif defined(ARDUINO_ARCH_RP2040)
+/* Raspberry Pi Pico / Pico 2 with T1S shield wired as:
+ *   CS  = GP17 (SPI0 CSn), RESET = GP21, IRQ = GP20 */
+static int const CS_PIN    =  17;
+static int const RESET_PIN =  21;
+static int const IRQ_PIN   =  20;
 #else
 static int const CS_PIN    =  -1;
 static int const RESET_PIN =  -1;
