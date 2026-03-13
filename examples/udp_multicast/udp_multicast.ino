@@ -1,8 +1,7 @@
-/*
- * This example has been tested with the Arduino 10BASE-T1S (T1TOS) shield.
- *
- * Author:
- *  Alexander Entinger
+/**
+ * @file 
+ * @author Chace0219 (chace0219@gmail.com)
+ * 
  */
 
 /**************************************************************************************
@@ -19,32 +18,37 @@
 
 static uint8_t const T1S_PLCA_NODE_ID = 1;
 
-static IPAddress const ip_addr     {192, 168,  42, 100 + T1S_PLCA_NODE_ID};
-static IPAddress const network_mask{255, 255, 255,   0};
-static IPAddress const gateway     {192, 168,  42, 100};
+// static IPAddress const ip_addr     {192, 168,  137, 100};
+// static IPAddress const network_mask{255, 255, 255,   0};
+// static IPAddress const gateway     {192, 168,  137, 1};
+
+/* All zeroes — DHCP will supply the real address after PLCA comes up.
+ * Windows ICS assigns from 192.168.137.x by default. */
+static IPAddress const ip_addr     {0, 0, 0, 0};
+static IPAddress const network_mask{0, 0, 0, 0};
+static IPAddress const gateway     {0, 0, 0, 0};
 
 static T1SPlcaSettings const t1s_plca_settings{T1S_PLCA_NODE_ID};
 static T1SMacSettings const t1s_default_mac_settings;
 
-static IPAddress const UDP_SERVER_IP_ADDR = {192, 168,  42, 100 + 0};
-static uint16_t const UDP_CLIENT_PORT = 8889;
-static uint16_t const UDP_SERVER_PORT = 8888;
+static IPAddress const UDP_MULTICAST_ADDR = {239, 1, 2, 3}; /* 10BASE-T1S local multicast group */
+static uint16_t const UDP_PORT = 8888;
 
 /**************************************************************************************
  * GLOBAL VARIABLES
  **************************************************************************************/
 
-#if defined(ARDUINO_GIGA) || defined(ARDUINO_PORTENTA_C33)
-  Arduino_10BASE_T1S_PHY_TC6(SPI1, CS_PIN, RESET_PIN, IRQ_PIN);
-#else
-  Arduino_10BASE_T1S_PHY_TC6(SPI, CS_PIN, RESET_PIN, IRQ_PIN);
-#endif
+const int8_t CS_LAN8651_PIN = 17;
+const int8_t RST_LAN8651_PIN = 21;
+const int8_t IRQ_LAN8651_PIN = 20;
+Arduino_10BASE_T1S_PHY_TC6(SPI, CS_LAN8651_PIN, RST_LAN8651_PIN, IRQ_LAN8651_PIN);
+
 Arduino_10BASE_T1S_UDP udp_client;
 
 /**************************************************************************************
  * SETUP/LOOP
  **************************************************************************************/
-
+static void OnPlcaStatus(bool success, bool plcaStatus);
 void setup()
 {
   Serial.begin(115200);
@@ -79,18 +83,64 @@ void setup()
     for (;;) { }
   }
 
-  Serial.print("IP\t");
-  Serial.println(ip_addr);
+  Serial.print("MAC\t");
   Serial.println(mac_addr);
   Serial.println(t1s_plca_settings);
   Serial.println(t1s_default_mac_settings);
 
-  if (!udp_client.begin(UDP_CLIENT_PORT))
+  /* If DHCP is active (IP was 0.0.0.0), wait until a lease is obtained.
+   * PLCA must be active before any Ethernet frames can flow, so we run
+   * the same PLCA status / re-enable logic here that the main loop uses. */
+  if (ip_addr == IPAddress(0, 0, 0, 0))
   {
-    Serial.println("begin(...) failed for UDP client");
+    Serial.println("Waiting for DHCP lease (PLCA must come up first)...");
+    unsigned long last_plca_ms  = 0;
+    unsigned long last_dot_ms   = 0;
+
+    while (t1s_phy.localIP() == IPAddress(0, 0, 0, 0))
+    {
+      /* Service the TC6 hardware and lwIP stack as fast as possible. */
+      t1s_phy.service();
+
+      auto const now = millis();
+
+      /* Check PLCA status every second and re-enable if in CSMA/CD fallback. */
+      if ((now - last_plca_ms) >= 1000UL)
+      {
+        last_plca_ms = now;
+        if (!t1s_phy.getPlcaStatus(OnPlcaStatus))
+          Serial.println("[DHCP wait] getPlcaStatus() failed");
+      }
+
+      /* Print a progress dot every 2 s so the serial isn't flooded. */
+      if ((now - last_dot_ms) >= 2000UL)
+      {
+        last_dot_ms = now;
+        Serial.print(".");
+      }
+    }
+    Serial.println();
+    Serial.print("DHCP IP\t");
+    Serial.println(t1s_phy.localIP());
+  }
+  else
+  {
+    Serial.print("Static IP\t");
+    Serial.println(ip_addr);
+  }
+
+  /* Start receiving on the multicast group.
+   * beginMulticast() binds the port AND joins the IGMP group in one call.
+   * Must be called AFTER DHCP has assigned an IP — IGMP needs a real source address. */
+  // if (!udp_client.begin(UDP_PORT))
+  if (!udp_client.beginMulticast(UDP_MULTICAST_ADDR, UDP_PORT))
+  {
+    Serial.println("beginMulticast(...) failed for UDP client");
     for (;;) { }
   }
 
+  Serial.print("UDP multicast group: ");
+  Serial.println(UDP_MULTICAST_ADDR);
   Serial.println("UDP_Client");
 }
 
@@ -113,7 +163,7 @@ void loop()
       Serial.println("getPlcaStatus(...) failed");
   }
 
-  if ((now - prev_udp_packet_sent) > 1000)
+  if ((now - prev_udp_packet_sent) > 2000)
   {
     static int tx_packet_cnt = 0;
 
@@ -123,8 +173,9 @@ void loop()
     uint8_t udp_tx_msg_buf[256] = {0};
     int const tx_packet_size = snprintf((char *)udp_tx_msg_buf, sizeof(udp_tx_msg_buf), "Single-Pair Ethernet / 10BASE-T1S: packet cnt = %d", tx_packet_cnt);
 
-    /* Send a UDP packet to the UDP server. */
-    udp_client.beginPacket(UDP_SERVER_IP_ADDR, UDP_SERVER_PORT);
+    /* Send the UDP packet to the multicast group. Every node on the
+     * 10BASE-T1S segment that has joined 239.1.2.3 will receive it. */
+    udp_client.beginPacket(UDP_MULTICAST_ADDR, UDP_PORT);
     udp_client.write(udp_tx_msg_buf, tx_packet_size);
     udp_client.endPacket();
 
@@ -181,7 +232,18 @@ static void OnPlcaStatus(bool success, bool plcaStatus)
   }
 
   if (plcaStatus)
-    Serial.println("PLCA Mode active");
+  {
+    /* Restart DHCP the first time PLCA is confirmed active so that a
+     * fresh Discover goes out on a live link instead of relying on
+     * lwIP's exponential back-off timer from before the link was up. */
+    static bool dhcp_restarted = false;
+    if (!dhcp_restarted)
+    {
+      dhcp_restarted = true;
+      t1s_phy.restartDhcp();
+      Serial.println("[DHCP] restarted on live PLCA link");
+    }
+  }
   else {
     Serial.println("CSMA/CD fallback");
     t1s_phy.enablePlca();
