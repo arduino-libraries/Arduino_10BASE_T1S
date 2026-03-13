@@ -75,6 +75,10 @@ size_t MacAddress::printTo(Print & p) const
  **************************************************************************************/
 #include "Arduino.h"
 
+#if defined(ARDUINO_ARCH_RP2040)
+#include <pico/unique_id.h>
+#endif
+
 void get_unique_chip_id_3(uint8_t * uid)
 {
 #if defined(ARDUINO_ARCH_SAMD)
@@ -96,12 +100,21 @@ void get_unique_chip_id_3(uint8_t * uid)
     auto stm32_uid = HAL_GetUIDw2();
     memcpy(uid, &stm32_uid, 3);
   }
+#elif defined(ARDUINO_ARCH_RP2040)
+  {
+    /* RP2040 exposes a 64-bit unique board ID derived from the flash chip's
+     * unique serial number.  Use the first 3 bytes as the NIC-specific part
+     * of the MAC address. */
+    pico_unique_board_id_t board_id;
+    pico_get_unique_board_id(&board_id);
+    memcpy(uid, board_id.id, 3);
+  }
 #else
 # warning "Retrieving a unique chip ID for MAC generation is not supported on this platform."
 #endif
 }
 
-#if defined(ARDUINO_PORTENTA_C33)
+#if defined(ARDUINO_PORTENTA_C33) 
 extern "C" int LWIP_RAND() {
   return rand();
 }
