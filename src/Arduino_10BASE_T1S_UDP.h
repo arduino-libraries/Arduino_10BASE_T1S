@@ -19,15 +19,22 @@
 #include <vector>
 #include <memory>
 
-#include <Udp.h> // api/Udp.h
-#include <IPAddress.h> // api/IPAddress.h
+#include <api/Udp.h>
+#include <api/IPAddress.h>
 
+#if defined(ARDUINO_ARCH_RP2040)
+#include <lwip/udp.h>
+#include <lwip/ip_addr.h>
+#else
 #include "lib/liblwip/include/lwip/udp.h"
 #include "lib/liblwip/include/lwip/ip_addr.h"
+#endif
 
 #include "MacAddress.h"
 #include "T1SMacSettings.h"
 #include "T1SPlcaSettings.h"
+
+using arduino::IPAddress;
 
 /**************************************************************************************
  * CLASS DECLARATION
@@ -219,6 +226,21 @@ public:
    * @return uint16_t Returns the port number of the remote host.
    */
   virtual uint16_t remotePort() override;
+
+  /**
+   * @brief Joins a multicast group and starts listening on the specified port.
+   *
+   * Combines udp_bind + IGMP join in one call, matching the Arduino UDP API.
+   * Call this instead of begin() when you want to receive multicast packets.
+   *
+   * @param multicast_ip  IPv4 multicast group address (224.x.x.x – 239.x.x.x).
+   * @param port          Local port to bind.
+   * @return 1 on success, 0 on failure.
+   */
+  virtual uint8_t beginMulticast(IPAddress multicast_ip, uint16_t port) override;
+
+  bool joinMulticast(IPAddress const group_ip);
+  bool leaveMulticast(IPAddress const group_ip);
 
   /* This function MUST not be called from the user of this library,
    * it's used for internal purposes only.

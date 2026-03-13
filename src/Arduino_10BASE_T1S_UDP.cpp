@@ -14,6 +14,14 @@
 
 #include "Arduino_10BASE_T1S_UDP.h"
 
+#if LWIP_IGMP
+#if defined(ARDUINO_ARCH_RP2040)
+#include <lwip/igmp.h>
+#else
+#include "lib/liblwip/include/lwip/igmp.h"
+#endif
+#endif
+
 /**************************************************************************************
  * MODULE INTERNAL FUNCTION DECLARATION
  **************************************************************************************/
@@ -106,18 +114,20 @@ int Arduino_10BASE_T1S_UDP::endPacket()
   /* Copy data from transmit buffer over. */
   err_t err = pbuf_take(p, _tx_data.data(), _tx_data.size());
   if (err != ERR_OK)
+  {
+    pbuf_free(p);
     return -1;
+  }
 
   /* Empty our transmit buffer. */
   _tx_data.clear();
 
   /* Send UDP packet. */
   err = udp_sendto(_udp_pcb, p, &ipaddr, _send_to_port);
+  /* Always free our reference — lwIP has ref'd its own copy if it needed one. */
+  pbuf_free(p);
   if (err != ERR_OK)
     return -1;
-
-  /* Free pbuf */
-  pbuf_free(p);
 
   return 1;
 }
@@ -218,6 +228,46 @@ uint16_t Arduino_10BASE_T1S_UDP::remotePort()
     return 0;
 }
 
+uint8_t Arduino_10BASE_T1S_UDP::beginMulticast(IPAddress multicast_ip, uint16_t port)
+{
+  /* Bind the local port first. */
+  if (!begin(port))
+    return 0;
+
+  /* Join the IGMP group so the netif passes frames destined for this address. */
+  if (!joinMulticast(multicast_ip))
+  {
+    stop();
+    return 0;
+  }
+
+  return 1;
+}
+
+bool Arduino_10BASE_T1S_UDP::joinMulticast(IPAddress const group_ip)
+{
+#if LWIP_IGMP
+  ip4_addr_t group;
+  IP4_ADDR(&group, group_ip[0], group_ip[1], group_ip[2], group_ip[3]);
+  return (igmp_joingroup(IP4_ADDR_ANY4, &group) == ERR_OK);
+#else
+  (void)group_ip;
+  return false;
+#endif
+}
+
+bool Arduino_10BASE_T1S_UDP::leaveMulticast(IPAddress const group_ip)
+{
+#if LWIP_IGMP
+  ip4_addr_t group;
+  IP4_ADDR(&group, group_ip[0], group_ip[1], group_ip[2], group_ip[3]);
+  return (igmp_leavegroup(IP4_ADDR_ANY4, &group) == ERR_OK);
+#else
+  (void)group_ip;
+  return false;
+#endif
+}
+
 void Arduino_10BASE_T1S_UDP::onUdpRawRecv(struct udp_pcb *pcb, struct pbuf *p, const ip_addr_t *addr, uint16_t port)
 {
   /* Obtain remote port and remote IP. */
@@ -228,12 +278,18 @@ void Arduino_10BASE_T1S_UDP::onUdpRawRecv(struct udp_pcb *pcb, struct pbuf *p, c
     ip4_addr4(addr));
   auto const remote_port = port;
 
-  /* Create UDP object. */
+  /* Flatten the pbuf chain into a contiguous buffer.
+   * p->len  is only the first segment; p->tot_len is the full datagram.
+   * Using p->payload / p->len alone silently truncates chained pbufs. */
+  size_t const total_len = p->tot_len;
+  std::vector<uint8_t> flat(total_len);
+  pbuf_copy_partial(p, flat.data(), (u16_t)total_len, 0);
+
   auto const rx_pkt = std::make_shared<UdpRxPacket>(
     remote_ip,
     remote_port,
-    (uint8_t const *)p->payload,
-    p->len);
+    flat.data(),
+    total_len);
 
   // drop the oldest packet if the list is full
   if(_rx_pkt_list.size() > _rx_pkt_list_size) {
