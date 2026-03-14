@@ -8,8 +8,7 @@
  *   Arduino_10BASE_T1S_TCPServer  — subclasses Arduino Server
  *
  * Both classes use a shared pool of T1STCPState connection objects backed by
- * lwIP raw-TCP callbacks.  No ArduinoModbus, ArduinoRS485, or EthernetXxx
- * dependency is required.
+ * lwIP raw-TCP callbacks.  
  *
  * Tunable constants (override before inclusion if needed):
  *   T1S_TCP_MAX_CONNS    – simultaneous connections (default 8)
