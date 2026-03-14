@@ -14,9 +14,8 @@
   "license": "MPL-2.0",
   "build": {
     "srcFilter": [
-      "+<*>",
-      "-<src/lib/liblwip/**>"
+      "+<*>"
     ]
   },
-  "note": "The bundled liblwip sources are excluded here because on RP2040 (arduino-pico) the core already supplies a compatible lwIP 2.x stack. The library source files use #ifdef ARDUINO_ARCH_RP2040 to switch between the core-supplied headers (<lwip/...>) and the bundled headers. For non-RP2040 targets (e.g. Arduino UNO R4 / Renesas) a separate environment that re-adds the liblwip sources is needed."
+  "note": "Bundled lwIP C sources are compiled through src/lib/lwip_vendor wrapper translation units and are gated with #if !defined(ARDUINO_ARCH_RP2040). This keeps one source tree compatible with both Arduino IDE and PlatformIO while RP2040 uses core lwIP headers and implementation."
 }
