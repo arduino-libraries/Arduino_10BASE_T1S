@@ -6,11 +6,17 @@ on:
       - ".github/workflows/compile-examples.yml"
       - "examples/**"
       - "src/**"
+      - "third_party/**"
+      - "library.json"
+      - "library.properties"
   push:
     paths:
       - ".github/workflows/compile-examples.yml"
       - "examples/**"
       - "src/**"
+      - "third_party/**"
+      - "library.json"
+      - "library.properties"
 
 jobs:
   build:
@@ -48,6 +54,10 @@ jobs:
           - fqbn: arduino:mbed_portenta:envie_m7
             platforms: |
               - name: arduino:mbed_portenta
+          - fqbn: rp2040:rp2040:rpipico
+            platforms: |
+              - name: rp2040:rp2040
+                source-url: https://github.com/earlephilhower/arduino-pico/releases/download/global/package_rp2040_index.json
 
     steps:
       - name: Checkout
